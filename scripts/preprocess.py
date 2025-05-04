@@ -4,11 +4,11 @@ from torchvision import transforms
 import os
 import numpy as np
 
-# Thư mục chứa ảnh gốc (input)
-image_folder = "license_plate/dataset/raw_image"
+image_folder = "E:/CODE/NHOM/nhandienmat/license_plate/dataset/raw_images"
+processed_image_folder = "E:/CODE/NHOM/nhandienmat/license_plate/dataset/processed_images"
 
-# Đường dẫn đến thư mục lưu ảnh đã xử lý (output)
-processed_image_folder = "license_plate/dataset/processed_images"
+
+
 
 # # Tạo thư mục processed_images nếu chưa tồn tại
 # if not os.path.exists(processed_image_folder):

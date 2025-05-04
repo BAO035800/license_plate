@@ -1,5 +1,5 @@
-train: dataset/train/image
-val: dataset/test/image
+train: ../dataset/train/images
+val: ../dataset/test/images
 
 nc: 1
 names: ['license_plate']
