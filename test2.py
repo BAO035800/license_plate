@@ -9,7 +9,7 @@ os.makedirs("output", exist_ok=True)
 # Load mô hình YOLOv5 đã huấn luyện
 model = torch.hub.load('yolov5', 'custom', path='./yolov5/runs/train/exp18/weights/best.pt', source='local')
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 while True:
     ret, frame = cap.read()
