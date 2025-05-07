@@ -3,7 +3,7 @@ import random
 import shutil
 
 # Cấu hình
-IMAGE_DIR = 'dataset/raw_images'
+IMAGE_DIR = 'dataset/raw_image'
 LABEL_DIR = 'dataset/labels'
 
 TRAIN_IMAGE_DIR = 'dataset/train/images'
@@ -20,7 +20,7 @@ os.makedirs(TEST_IMAGE_DIR, exist_ok=True)
 os.makedirs(TEST_LABEL_DIR, exist_ok=True)
 
 # Lấy danh sách file ảnh (định dạng .jpg hoặc .png)
-image_files = [f for f in os.listdir(IMAGE_DIR) if f.endswith(('.jpg', '.png'))]
+image_files = [f for f in os.listdir(IMAGE_DIR) if f.endswith(('.jpg', '.png','jpeg'))]
 
 # Shuffle ảnh ngẫu nhiên
 random.shuffle(image_files)

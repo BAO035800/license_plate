@@ -4,7 +4,7 @@ from torchvision import transforms
 import os
 import numpy as np
 
-image_folder = "E:/CODE/NHOM/nhandienmat/license_plate/dataset/raw_images"
+image_folder = "E:/CODE/NHOM/nhandienmat/license_plate/dataset/raw_image"
 processed_image_folder = "E:/CODE/NHOM/nhandienmat/license_plate/dataset/processed_images"
 
 
