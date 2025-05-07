@@ -2,12 +2,18 @@ import cv2
 import torch
 import time
 import os
+import easyocr
 
 # Tạo thư mục output nếu chưa có
 os.makedirs("output", exist_ok=True)
 
 # Load mô hình YOLOv5 đã huấn luyện
 model = torch.hub.load('yolov5', 'custom', path='./yolov5/runs/train/exp18/weights/best.pt', source='local')
+
+# Khởi tạo EasyOCR (chọn ngôn ngữ, ví dụ: 'en' cho tiếng Anh)
+reader = easyocr.Reader(['en'], gpu=torch.cuda.is_available())
+
+# Khởi tạo webcam
 cap = cv2.VideoCapture(0)
 
 # Kích thước phóng to cho ảnh biển số (có thể điều chỉnh)
@@ -22,12 +28,13 @@ try:
 
         # Dự đoán bằng mô hình
         results = model(frame)
-        annotated_frame = results.render()[0]  # Ảnh có vẽ bounding box
+        annotated_frame = results.render()[0].copy()  # Tạo bản sao để đảm bảo mảng có thể ghi
 
         # Lấy các thông tin về bounding boxes
         boxes = results.xyxy[0].cpu().numpy()
         class_ids = results.names
         license_plates = []
+        detected_texts = []
 
         # Lặp qua các bounding boxes để cắt vùng biển số
         for box in boxes:
@@ -49,8 +56,25 @@ try:
                         new_h = int(ENLARGED_SIZE[0] / aspect_ratio)
                     enlarged_plate = cv2.resize(license_plate, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
 
+                    # Nhận diện ký tự bằng EasyOCR
+                    ocr_results = reader.readtext(enlarged_plate, detail=0)
+                    detected_text = " ".join(ocr_results).strip() if ocr_results else "Không nhận diện được"
+                    print(f"[INFO] Ký tự nhận diện: {detected_text}")
+
+                    # Vẽ text lên ảnh tổng quát
+                    cv2.putText(
+                        annotated_frame,
+                        detected_text,
+                        (int(x1), int(y1) - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.9,
+                        (0, 255, 0),
+                        2
+                    )
+
                     # Lưu vào danh sách
                     license_plates.append(enlarged_plate)
+                    detected_texts.append(detected_text)
 
                 except Exception as e:
                     print(f"[ERROR] Lỗi khi xử lý biển số: {str(e)}")
@@ -88,6 +112,16 @@ try:
                     print(f"[INFO] Đã lưu ảnh biển số vào {plate_filename}")
                 else:
                     print(f"[ERROR] Không thể lưu ảnh: {plate_filename}")
+
+            # Lưu ký tự nhận diện vào file text
+            text_filename = f"output/detected_text_{timestamp}.txt"
+            try:
+                with open(text_filename, 'w', encoding='utf-8') as f:
+                    for i, text in enumerate(detected_texts):
+                        f.write(f"Biển số {i}: {text}\n")
+                print(f"[INFO] Đã lưu ký tự nhận diện vào {text_filename}")
+            except Exception as e:
+                print(f"[ERROR] Không thể lưu file text: {str(e)}")
 
 except Exception as e:
     print(f"[ERROR] Lỗi trong vòng lặp chính: {str(e)}")
